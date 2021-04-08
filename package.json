@@ -1,0 +1,16 @@
+{
+  "name": "shamebot",
+  "version": "1.0.0",
+  "description": "A time logging notifier for Slack",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "main": "node index.js"
+  },
+  "author": "Carwin Young",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "dotenv": "^8.2.0"
+  }
+}
