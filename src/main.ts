@@ -14,6 +14,7 @@ const app = new App({
 (async () => {
   await app.start(config.app.port as number);
   console.log('Harvest Shamebot is online.');
+  console.log('Shamebot is listening for the trigger phrase: ', config.options.triggerPhrase);
 })();
 
 // Loop over the collected Harvest users and look for matching emails from that
@@ -56,7 +57,7 @@ const prepareShame = async(client: any) => {
 
 
 // Sends the official message of shame to Slack.
-app.message('shame', async({ message, say, client }) => {
+app.message(config.options.triggerPhrase, async({ message, say, client }) => {
   // Collect the users who haven't met their expected hours.
   const users = await prepareShame(client);
   // Turn them into a newline separated string.

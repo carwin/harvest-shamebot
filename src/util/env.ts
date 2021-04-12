@@ -29,6 +29,7 @@ let config = {
     teamID: process.env.SLACK_TEAM_ID,
   },
   options: {
+    triggerPhrase: process.env.TRIGGER_PHRASE || 'harvest shamebot',
     orgMailsOnly: process.env.ORG_MAILS_ONLY ? !!+process.env.ORG_MAILS_ONLY : false,
     orgMailsTLD: process.env.ORG_EMAIL_TLD && process.env.ORG_EMAIL_TLD.includes('.') ? process.env.ORG_EMAIL_TLD : '',
     specificTeamsOnly: process.env.SPECIFIC_TEAMS_ONLY ? !!+process.env.SPECIFIC_TEAMS_ONLY : false,
