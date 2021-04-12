@@ -14,6 +14,8 @@ The quick version of this section is:
  - Configure Slack App
  - Configure Harvest personal access token
  - Run the Shamebot with `npm run start`.
+ - Invite the bot to a Slack channel.
+ - Summon the bot with the trigger phrase.
 
 ### Dependencies
 
@@ -95,3 +97,5 @@ A comma separated list of email addresses to ignore when collecting user account
 The phrase the bot will listen for. If the bot sees this phrase in a channel it is in, it will send the Message of Shame.
 
 This option can be either a string or a regular expression.
+
+The default trigger phrase is: `Shamebot, activate!`
