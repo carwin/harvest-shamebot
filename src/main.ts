@@ -1,3 +1,5 @@
+// @ts-ignore
+import schedule from 'node-schedule';
 import { App } from '@slack/bolt';
 import config from './util/env';
 import { isGenericMessageEvent } from './util/helpers'
@@ -15,7 +17,42 @@ const app = new App({
   await app.start(config.app.port as number);
   console.log('Harvest Shamebot is online.');
   console.log('Shamebot is listening for the trigger phrase: ', config.options.triggerPhrase);
+
+  const scheduleRule = new schedule.RecurrenceRule();
+  scheduleRule.dayOfWeek = [1, new schedule.Range(2-5)];
+  scheduleRule.hour = 16;
+  scheduleRule.minute = 30;
+  scheduleRule.tz = 'America/Chicago'
+
+  const job = schedule.scheduleJob(scheduleRule, () => {
+    console.log('here is where the job should run');
+    shame(app.client);
+  });
+
 })();
+
+// @ts-ignore
+const shame = async(client) => {
+  client.token = config.slack.botToken;
+  const channel = 'C01U2T93FUZ';
+
+  // Collect the users who haven't met their expected hours.
+  const users = await prepareShame(client);
+  // Turn them into a newline separated string.
+  const shameString = slack.shameObjectToString('slackID', users);
+  // Add a postScript message, this will be added as a 'context' block.
+  // See Slack's documentation around Block Kit.
+  const postScript = '*Shame has been applied to this message.* \nIf you would like to not have shame, log your time in Harvest and click the button above.';
+
+
+  const body = slack.shameMessageTemplate(shameString, postScript);
+
+  await client.chat.postMessage({
+    blocks: body.blocks,
+    channel: channel,
+  });
+
+}
 
 // Loop over the collected Harvest users and look for matching emails from that
 // list in the slackUsers list. When a match is found, push the slackID value
