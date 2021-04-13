@@ -99,3 +99,23 @@ The phrase the bot will listen for. If the bot sees this phrase in a channel it 
 This option can be either a string or a regular expression.
 
 The default trigger phrase is: `Shamebot, activate!`
+
+##### WEEKLY_FULL_TIME_HOURS
+
+The weekly hours you consider full-time. For most organizations, this is probably 40.
+
+##### SHAME_FULL_TIME_ONLY
+
+If you have users that have a weekly allocation below the hours set in `WEEKLY_FULL_TIME_HOURS` and you do not want to report on them, set this to `1`.
+
+##### INCLUDE_CONTRACTORS
+
+Set this to `1` if you would like to expand your shame list to include contrators in Harvest.
+
+##### REPORT_TODAY_OR_YESTERDAY
+
+This option allows you to report on either `today` or `yesterday`.
+
+##### EXPLAINER_TEXT
+
+This option sets some small text below the List of Shame, typically used for explaining how the list was pulled together.
