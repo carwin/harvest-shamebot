@@ -5,8 +5,22 @@ const pathToConfig = '../../.env';
 
 dotenvconfig({ path: resolve(__dirname, pathToConfig) });
 
-const todayQueryFormat = new Date().toISOString().replace('-', '');
-const todayDisplayFormat = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+// Configure the various uses of the date using the env variable REPORT_TODAY_OR_YESTERDAY.
+let today: string | Date = new Date();
+let yesterday: string | Date = new Date(today);
+yesterday.setDate(yesterday.getDate() - 1);
+
+let queryDateFormat;
+let displayDateFormat;
+
+if (process.env.REPORT_TODAY_OR_YESTERDAY === 'yesterday') {
+  queryDateFormat = yesterday.toISOString().slice(0, 10).replace(/-/g, '');
+  displayDateFormat = yesterday.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+}
+else {
+  queryDateFormat = today.toISOString().slice(0, 10).replace(/-/g, '');
+  displayDateFormat = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+}
 
 // The bot should support regular expressions as a trigger phrase
 // because Bolt supports it and its cool. To do that there needs
@@ -29,8 +43,8 @@ let config = {
   app: {
     port: process.env.PORT || 2100,
     todaysDate: {
-      queryFormat: todayQueryFormat,
-      displayFormat: todayDisplayFormat
+      queryFormat: queryDateFormat,
+      displayFormat: displayDateFormat,
     }
   },
   harvest: {
@@ -52,6 +66,10 @@ let config = {
     specificTeams: process.env.SPECIFIC_TEAMS && process.env.SPECIFIC_TEAMS.includes(',') ? process.env.SPECIFIC_TEAMS.split(',') : [],
     pretendItNeverHappened: process.env.PRETEND_IT_NEVER_HAPPENED ? !!+process.env.PRETEND_IT_NEVER_HAPPENED : false,
     ignoreList: process.env.IGNORE_LIST && process.env.IGNORE_LIST.includes(',') ? process.env.IGNORE_LIST.split(',') : [],
+    includeContractors: !!Number(process.env.INCLUDE_CONTRACTORS),
+    shameFullTimeOnly: !!Number(process.env.SHAME_FULL_TIME_ONLY),
+    weeklyFullTimeHours: Number(process.env.WEEKLY_FULL_TIME_HOURS),
+    explainerText: process.env.EXPLAINER_TEXT,
   }
 }
 

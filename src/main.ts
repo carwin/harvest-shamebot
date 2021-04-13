@@ -75,19 +75,15 @@ const matchUserAccounts = (slackUsers: slack.SlackMember[], harvestUsers: harves
 const prepareShame = async(client: any) => {
 
   // Harvest Data
-  const harvestUsers  = await harvest.getUsers(),
-        harvestReport = await harvest.getTodaysTimeReport(),
-        collectedHarvestUsers = harvest.getReportableUsers(harvestUsers, harvestReport);
+  const harvestUsers  = await harvest.getUsers();
+  const harvestReport = await harvest.getTodaysTimeReport();
+  const collectedHarvestUsers = harvest.getReportableUsers(harvestUsers, harvestReport);
 
   // Slack Data
   const slackUsers = await slack.getUsers(client);
 
   // Combined user data
   const users = matchUserAccounts(slackUsers, collectedHarvestUsers);
-
-  // Log some info out to the console before returning the collectedHarvestUsers.
-  console.log(`There are ${harvestUsers.length} Harvest users.`);
-  console.log(`Of those ${harvestUsers.length}, among those that are billable, ${collectedHarvestUsers.length} have not reported all their time today.`);
 
   return users;
 }
