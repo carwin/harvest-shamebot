@@ -77,6 +77,7 @@ let config = {
     explainerText: process.env.EXPLAINER_TEXT,
     tz: process.env.TZ,
     endOrBeginningOfDay: process.env.END_OR_BEGINNING_OF_DAY,
+    scheduledChannel: process.env.SCHEDULED_CHANNEL,
   }
 }
 

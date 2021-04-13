@@ -45,7 +45,7 @@ const app = new App({
 // @ts-ignore
 const shame = async(client) => {
   client.token = config.slack.botToken;
-  const channel = 'C01U2T93FUZ';
+  const channel = config.options.scheduledChannel;
 
   // Collect the users who haven't met their expected hours.
   const users = await prepareShame(client);

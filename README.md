@@ -133,3 +133,7 @@ If set to `beginning` and `REPORT_TODAY_OR_YESTERDAY` is set to `yesterday`, the
 ##### TZ
 
 This value is used to determine the timezone used for the automated shaming. Use a value like, `America/Chicago`.
+
+##### SCHEDULED_CHANNEL
+
+This is the channel the bot will post its automated message to.
