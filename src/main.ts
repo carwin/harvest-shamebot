@@ -20,14 +20,25 @@ const app = new App({
 
   const scheduleRule = new schedule.RecurrenceRule();
   scheduleRule.dayOfWeek = [1, new schedule.Range(2-5)];
-  scheduleRule.hour = 16;
-  scheduleRule.minute = 30;
-  scheduleRule.tz = 'America/Chicago'
+  scheduleRule.tz = config.options.tz;
+
+  if (config.options.endOrBeginningOfDay === 'beginning') {
+    scheduleRule.hour = 9;
+    scheduleRule.minute = 30;
+  }
+  if (config.options.endOrBeginningOfDay === 'end') {
+    scheduleRule.hour = 17;
+    scheduleRule.minute = 30;
+  }
 
   const job = schedule.scheduleJob(scheduleRule, () => {
-    console.log('here is where the job should run');
+    console.log('Sending automated message.');
     shame(app.client);
   });
+
+  const nextRun = job.nextInvocation();
+
+  console.log(`The next scheduled Shamebot message is set for ${nextRun._date.c.hour}:${nextRun._date.c.minute} on ${nextRun._date.c.month}/${nextRun._date.c.day}/${nextRun._date.c.year}`);
 
 })();
 

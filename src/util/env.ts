@@ -8,7 +8,12 @@ dotenvconfig({ path: resolve(__dirname, pathToConfig) });
 // Configure the various uses of the date using the env variable REPORT_TODAY_OR_YESTERDAY.
 let today: string | Date = new Date();
 let yesterday: string | Date = new Date(today);
-yesterday.setDate(yesterday.getDate() - 1);
+const currentWeekday = today.toLocaleDateString('en-US', {weekday: 'long'});
+if (currentWeekday === 'Monday') {
+  yesterday.setDate(yesterday.getDate() - 3);
+} else {
+  yesterday.setDate(yesterday.getDate() - 1);
+}
 
 let queryDateFormat;
 let displayDateFormat;
@@ -70,6 +75,8 @@ let config = {
     shameFullTimeOnly: !!Number(process.env.SHAME_FULL_TIME_ONLY),
     weeklyFullTimeHours: Number(process.env.WEEKLY_FULL_TIME_HOURS),
     explainerText: process.env.EXPLAINER_TEXT,
+    tz: process.env.TZ,
+    endOrBeginningOfDay: process.env.END_OR_BEGINNING_OF_DAY,
   }
 }
 

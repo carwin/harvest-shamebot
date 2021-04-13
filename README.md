@@ -119,3 +119,17 @@ This option allows you to report on either `today` or `yesterday`.
 ##### EXPLAINER_TEXT
 
 This option sets some small text below the List of Shame, typically used for explaining how the list was pulled together.
+
+##### END_OR_BEGINNING_OF_DAY
+
+This option determines what time of day Shamebot will do its scheduled shaming.
+
+If set to `beginning`, the bot will send out its message every day at 9:30AM.
+
+If set to `end`, the bot will send out its message every day at 5:00PM.
+
+If set to `beginning` and `REPORT_TODAY_OR_YESTERDAY` is set to `yesterday`, the bot will report every day at 9:30AM for the previous day. On Mondays, it will report on the previous Friday.
+
+##### TZ
+
+This value is used to determine the timezone used for the automated shaming. Use a value like, `America/Chicago`.
