@@ -71,19 +71,61 @@ const getTodaysTimeReport = async() => {
   return  todaysReport.data.results;
 }
 
+// Check if a given email address should be reported on based on the orgMailsOnly option.
+const checkOrgMailOption = (email: string) => {
+  if (config.options.orgMailsOnly === true) {
+    return email.toLowerCase().includes(config.options.orgMailsTLD);
+  }
+  if (config.options.orgMailsOnly === false) {
+    return true;
+  }
+}
+
+// Check if a given email address should be reported on based on the ignoreList option.
+const checkIgnoreListOption = (email: string) => {
+  if (config.options.ignoreList.length > 0) {
+    return !config.options.ignoreList.some(ignored => ignored.toLowerCase().includes(email.toLowerCase()));
+  }
+  else {
+    return true;
+  }
+}
+
+// Check if the given HarvestUser should be reported on based on the includeContractors option.
+const checkReportContractorsOption = (user: HarvestUser) => {
+  if (config.options.includeContractors === true && user.isContractor === true) {
+    return true;
+  }
+  if (config.options.includeContractors === false && user.isContractor === true) {
+    return false;
+  }
+  if (user.isContractor === false) {
+    return true;
+  }
+}
+
+// Check if the given HarvestUser should be reported on based on the shameFullTimeOnly option.
+const checkReportFullTimeOnly = (user: HarvestUser) => {
+  if (config.options.shameFullTimeOnly === true && Number((user.weeklyCapacity / 3600)) < config.options.weeklyFullTimeHours) {
+    return false;
+  } else {
+    return true;
+  }
+}
 
 const getReportableUsers = (harvestUsers: HarvestUser[], timeReport: ReportUser[]) => {
-  const reportableUsers = [];
+  const reportableUsers : HarvestUser[] = [];
 
   // For every user in the harvestUsersCollection, check if weekly capacity is greater than 0,
   // then check if the user's email address belongs to the orgMailsTLD.
   // If it is, add them to the reportableUsers array.
   for (let i = 0; i < harvestUsers.length; i++) {
-    if (harvestUsers[i].weeklyCapacity > 0
-        && (config.options.orgMailsOnly ? harvestUsers[i].email.toLowerCase().includes(config.options.orgMailsTLD) : true)
-        && (config.options.ignoreList.length > 0 ? !config.options.ignoreList.some(email => email.toLowerCase().includes(harvestUsers[i].email.toLowerCase())) : true)
-    ) {
-      reportableUsers.push(harvestUsers[i]);
+    if (harvestUsers[i].weeklyCapacity > 0) {
+
+      if (checkOrgMailOption(harvestUsers[i].email) && checkIgnoreListOption(harvestUsers[i].email)
+        && checkReportContractorsOption(harvestUsers[i]) && checkReportFullTimeOnly(harvestUsers[i])) {
+        reportableUsers.push(harvestUsers[i]);
+      }
     }
   }
 
@@ -91,7 +133,6 @@ const getReportableUsers = (harvestUsers: HarvestUser[], timeReport: ReportUser[
   // from todaysReport against their calculated daily capacity.
   // For this, a new array will be created by using a reducer function.
   const usersBelowDailyExpectation = reportableUsers.reduce((accumulator, currentValue) => {
-    // console.log('current', currentValue);
     timeReport.find((user: ReportUser) => {
       if ((user.user_name === currentValue.name && user.total_hours < ((currentValue.weeklyCapacity / 3600) / 5))) {
         accumulator.push({

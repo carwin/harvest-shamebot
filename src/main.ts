@@ -1,3 +1,5 @@
+// @ts-ignore
+import schedule from 'node-schedule';
 import { App } from '@slack/bolt';
 import config from './util/env';
 import { isGenericMessageEvent } from './util/helpers'
@@ -15,7 +17,53 @@ const app = new App({
   await app.start(config.app.port as number);
   console.log('Harvest Shamebot is online.');
   console.log('Shamebot is listening for the trigger phrase: ', config.options.triggerPhrase);
+
+  const scheduleRule = new schedule.RecurrenceRule();
+  scheduleRule.dayOfWeek = [1, new schedule.Range(2-5)];
+  scheduleRule.tz = config.options.tz;
+
+  if (config.options.endOrBeginningOfDay === 'beginning') {
+    scheduleRule.hour = 9;
+    scheduleRule.minute = 30;
+  }
+  if (config.options.endOrBeginningOfDay === 'end') {
+    scheduleRule.hour = 17;
+    scheduleRule.minute = 30;
+  }
+
+  const job = schedule.scheduleJob(scheduleRule, () => {
+    console.log('Sending automated message.');
+    shame(app.client);
+  });
+
+  const nextRun = job.nextInvocation();
+
+  console.log(`The next scheduled Shamebot message is set for ${nextRun._date.c.hour}:${nextRun._date.c.minute} on ${nextRun._date.c.month}/${nextRun._date.c.day}/${nextRun._date.c.year}`);
+
 })();
+
+// @ts-ignore
+const shame = async(client) => {
+  client.token = config.slack.botToken;
+  const channel = config.options.scheduledChannel;
+
+  // Collect the users who haven't met their expected hours.
+  const users = await prepareShame(client);
+  // Turn them into a newline separated string.
+  const shameString = slack.shameObjectToString('slackID', users);
+  // Add a postScript message, this will be added as a 'context' block.
+  // See Slack's documentation around Block Kit.
+  const postScript = '*Shame has been applied to this message.* \nIf you would like to not have shame, log your time in Harvest and click the button above.';
+
+
+  const body = slack.shameMessageTemplate(shameString, postScript);
+
+  await client.chat.postMessage({
+    blocks: body.blocks,
+    channel: channel,
+  });
+
+}
 
 // Loop over the collected Harvest users and look for matching emails from that
 // list in the slackUsers list. When a match is found, push the slackID value
@@ -38,19 +86,15 @@ const matchUserAccounts = (slackUsers: slack.SlackMember[], harvestUsers: harves
 const prepareShame = async(client: any) => {
 
   // Harvest Data
-  const harvestUsers  = await harvest.getUsers(),
-        harvestReport = await harvest.getTodaysTimeReport(),
-        collectedHarvestUsers = harvest.getReportableUsers(harvestUsers, harvestReport);
+  const harvestUsers  = await harvest.getUsers();
+  const harvestReport = await harvest.getTodaysTimeReport();
+  const collectedHarvestUsers = harvest.getReportableUsers(harvestUsers, harvestReport);
 
   // Slack Data
   const slackUsers = await slack.getUsers(client);
 
   // Combined user data
   const users = matchUserAccounts(slackUsers, collectedHarvestUsers);
-
-  // Log some info out to the console before returning the collectedHarvestUsers.
-  console.log(`There are ${harvestUsers.length} Harvest users.`);
-  console.log(`Of those ${harvestUsers.length}, among those that are billable, ${collectedHarvestUsers.length} have not reported all their time today.`);
 
   return users;
 }

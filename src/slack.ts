@@ -91,7 +91,7 @@ const shameMessageTemplate = (shameList: string, postScript: string) => {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `Team, don\'t forget to report the working hours in Harvest *every day*.\n\nHere is a list of people who didn\'t report their working hours today, *${config.app.todaysDate.displayFormat}*:`,
+          text: `Team, don\'t forget to report the working hours in Harvest *every day*.\n\nHere is a list of people who didn\'t report their working hours ${process.env.REPORT_TODAY_OR_YESTERDAY}, *${config.app.todaysDate.displayFormat}*:`,
         },
       },
       {
@@ -101,6 +101,15 @@ const shameMessageTemplate = (shameList: string, postScript: string) => {
           type: 'mrkdwn',
           text: shameList
         }
+      },
+      {
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: config.options.explainerText,
+          }
+        ]
       },
       {
         type: 'divider'

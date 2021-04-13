@@ -99,3 +99,41 @@ The phrase the bot will listen for. If the bot sees this phrase in a channel it 
 This option can be either a string or a regular expression.
 
 The default trigger phrase is: `Shamebot, activate!`
+
+##### WEEKLY_FULL_TIME_HOURS
+
+The weekly hours you consider full-time. For most organizations, this is probably 40.
+
+##### SHAME_FULL_TIME_ONLY
+
+If you have users that have a weekly allocation below the hours set in `WEEKLY_FULL_TIME_HOURS` and you do not want to report on them, set this to `1`.
+
+##### INCLUDE_CONTRACTORS
+
+Set this to `1` if you would like to expand your shame list to include contrators in Harvest.
+
+##### REPORT_TODAY_OR_YESTERDAY
+
+This option allows you to report on either `today` or `yesterday`.
+
+##### EXPLAINER_TEXT
+
+This option sets some small text below the List of Shame, typically used for explaining how the list was pulled together.
+
+##### END_OR_BEGINNING_OF_DAY
+
+This option determines what time of day Shamebot will do its scheduled shaming.
+
+If set to `beginning`, the bot will send out its message every day at 9:30AM.
+
+If set to `end`, the bot will send out its message every day at 5:00PM.
+
+If set to `beginning` and `REPORT_TODAY_OR_YESTERDAY` is set to `yesterday`, the bot will report every day at 9:30AM for the previous day. On Mondays, it will report on the previous Friday.
+
+##### TZ
+
+This value is used to determine the timezone used for the automated shaming. Use a value like, `America/Chicago`.
+
+##### SCHEDULED_CHANNEL
+
+This is the channel the bot will post its automated message to.
