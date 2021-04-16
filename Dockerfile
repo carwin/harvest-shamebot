@@ -5,7 +5,7 @@ WORKDIR /app
 COPY ["package.json", "package-lock.json", "tsconfig.json", "./"]
 
 RUN npm install -g typescript
-RUN npm install --production
+RUN npm install
 
 COPY . .
 
