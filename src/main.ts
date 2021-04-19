@@ -12,33 +12,50 @@ const app = new App({
   signingSecret: config.slack.signingSecret
 });
 
-// Run the application on a particular port:
+// The primary app function:
 (async () => {
+  // Run the application on a particular port:
   await app.start(config.app.port as number);
-  console.log('Harvest Shamebot is online.');
+
+  // Log some useful messages:
+  console.log('Harvest Shamebot is online...');
+  console.log('Shamebot thinks today is:', config.app.todaysDate.displayFormat);
   console.log('Shamebot is listening for the trigger phrase: ', config.options.triggerPhrase);
 
+  // Set up a scheduled run of the Message of Shame:
+  // First create the rule, this uses node-schedule which implements cron-parser.
   const scheduleRule = new schedule.RecurrenceRule();
-  scheduleRule.dayOfWeek = [1, new schedule.Range(2-5)];
-  scheduleRule.tz = config.options.tz;
+  scheduleRule.dayOfWeek = [1,2,3,4,5]; // Monday through Friday.
+  scheduleRule.tz = config.options.tz;  // Pull the Timezone string from the options.
 
+  // If the bot is configured to run at the beginning of the day, have it go at 9:30am.
   if (config.options.endOrBeginningOfDay === 'beginning') {
     scheduleRule.hour = 9;
     scheduleRule.minute = 30;
   }
+  // If the bot is configured to run at the end of the day, have it go at 5:30pm.
   if (config.options.endOrBeginningOfDay === 'end') {
     scheduleRule.hour = 17;
     scheduleRule.minute = 30;
   }
 
+  // Create the job.
   const job = schedule.scheduleJob(scheduleRule, () => {
-    console.log('Sending automated message.');
+    console.log(`Sending automated message to ${config.options.scheduledChannel} in Slack.`);
     shame(app.client);
+    console.log(`The next scheduled Shamebot message is set for ${nextRunTime} on ${nextRunDay}, ${nextRunDate}`);
   });
 
+  // Capture when the next expected run is expected:
   const nextRun = job.nextInvocation();
+  const nextRunTime = nextRun.toDate().toLocaleDateString('en-US', {timeStyle: 'short'});
+  const nextRunDate = nextRun.toDate().toLocaleDateString('en-US', {dateStyle: 'long'});
+  const nextRunDay = nextRun.toDate().toLocaleDateString('en-US', {weekday: 'long'});
 
-  console.log(`The next scheduled Shamebot message is set for ${nextRun._date.c.hour}:${nextRun._date.c.minute} on ${nextRun._date.c.month}/${nextRun._date.c.day}/${nextRun._date.c.year}`);
+  // Log out the next scheduled automated message's info:
+  if (nextRun.toDate() > new Date()) {
+    console.log(`The next scheduled Shamebot message is set for ${nextRunTime} on ${nextRunDay}, ${nextRunDate}`);
+  }
 
 })();
 
@@ -100,7 +117,8 @@ const prepareShame = async(client: any) => {
 }
 
 
-// Sends the official message of shame to Slack.
+// Respond to the triggerPhrase option:
+// If the bot is in a channel and sees the triggerPhrase, it should respond with the Message of Shame.
 app.message(config.options.triggerPhrase, async({ message, say, client }) => {
   // Collect the users who haven't met their expected hours.
   const users = await prepareShame(client);
@@ -116,6 +134,13 @@ app.message(config.options.triggerPhrase, async({ message, say, client }) => {
   const body = slack.shameMessageTemplate(shameString, postScript);
   // @ts-ignore
   await say(body);
+});
+
+
+// Respond to a config request phrase:
+app.message('Shamebot, show config', async({ message, say, client }) => {
+  let configString : string = JSON.stringify(config, null, 2);
+  await say('```' + configString + '```');
 });
 
 // When a user clicks the I've Logged My Time button in the bot's message, update the message instead

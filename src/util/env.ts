@@ -8,8 +8,14 @@ dotenvconfig({ path: resolve(__dirname, pathToConfig) });
 // Configure the various uses of the date using the env variable REPORT_TODAY_OR_YESTERDAY.
 let today: string | Date = new Date();
 let yesterday: string | Date = new Date(today);
+
+// backReportDays is an array of weekday names on which we should report report the previous Friday.
+const backReportDays = ['Saturday', 'Sunday', 'Monday'];
 const currentWeekday = today.toLocaleDateString('en-US', {weekday: 'long'});
-if (currentWeekday === 'Monday') {
+
+// If currentWeekday is in the backReportDays array, set the bot's concept of 'yesterday' to be last Friday.
+// Otherwise, yesterday is just the day before today.
+if (backReportDays.some(e => e === currentWeekday)) {
   yesterday.setDate(yesterday.getDate() - 3);
 } else {
   yesterday.setDate(yesterday.getDate() - 1);
@@ -18,15 +24,18 @@ if (currentWeekday === 'Monday') {
 let queryDateFormat;
 let displayDateFormat;
 
+// If the app is configured to report yesterday, set queryDateFormat and displayDateFormat to yesterday.
 if (process.env.REPORT_TODAY_OR_YESTERDAY === 'yesterday') {
   queryDateFormat = yesterday.toISOString().slice(0, 10).replace(/-/g, '');
   displayDateFormat = yesterday.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 }
+// If the app is configured to report today, set queryDateFormat and displayDateFormat to today.
 else {
   queryDateFormat = today.toISOString().slice(0, 10).replace(/-/g, '');
   displayDateFormat = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 }
 
+// Handle the Trigger Phrase option:
 // The bot should support regular expressions as a trigger phrase
 // because Bolt supports it and its cool. To do that there needs
 // to be some processing.
