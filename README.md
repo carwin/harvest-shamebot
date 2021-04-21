@@ -7,6 +7,10 @@ it finds them, it sends a message to Slack to lay on the shame!
 If a user wishes to reclaim their dignity, they can click a button attached to
 the Slack message to remove themselves from the shame notification.
 
+![image](https://user-images.githubusercontent.com/715967/115611864-40339c00-a2b0-11eb-827e-0b93f0530545.png)
+![image](https://user-images.githubusercontent.com/715967/115611928-56415c80-a2b0-11eb-9d8e-cc9f8436f599.png)
+
+
 ## Running the Shamebot
 
 The quick version of this section is:
