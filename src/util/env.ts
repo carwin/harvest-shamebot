@@ -5,34 +5,44 @@ const pathToConfig = '../../.env';
 
 dotenvconfig({ path: resolve(__dirname, pathToConfig) });
 
-// Configure the various uses of the date using the env variable REPORT_TODAY_OR_YESTERDAY.
-let today: string | Date = new Date();
-let yesterday: string | Date = new Date(today);
+// Gets the day to report on and returns an object with the date formatted for display and for queries.
+const getDay = () => {
 
-// backReportDays is an array of weekday names on which we should report report the previous Friday.
-const backReportDays = ['Saturday', 'Sunday', 'Monday'];
-const currentWeekday = today.toLocaleDateString('en-US', {weekday: 'long'});
+  // Configure the various uses of the date using the env variable REPORT_TODAY_OR_YESTERDAY.
+  let today: string | Date = new Date();
+  let yesterday: string | Date = new Date(today);
 
-// If currentWeekday is in the backReportDays array, set the bot's concept of 'yesterday' to be last Friday.
-// Otherwise, yesterday is just the day before today.
-if (backReportDays.some(e => e === currentWeekday)) {
-  yesterday.setDate(yesterday.getDate() - 3);
-} else {
-  yesterday.setDate(yesterday.getDate() - 1);
-}
+  // backReportDays is an array of weekday names on which we should report report the previous Friday.
+  const backReportDays = ['Saturday', 'Sunday', 'Monday'];
+  const currentWeekday = today.toLocaleDateString('en-US', {weekday: 'long'});
 
-let queryDateFormat;
-let displayDateFormat;
+  // If currentWeekday is in the backReportDays array, set the bot's concept of 'yesterday' to be last Friday.
+  // Otherwise, yesterday is just the day before today.
+  if (backReportDays.some(e => e === currentWeekday)) {
+    yesterday.setDate(yesterday.getDate() - 3);
+  } else {
+    yesterday.setDate(yesterday.getDate() - 1);
+  }
 
-// If the app is configured to report yesterday, set queryDateFormat and displayDateFormat to yesterday.
-if (process.env.REPORT_TODAY_OR_YESTERDAY === 'yesterday') {
-  queryDateFormat = yesterday.toISOString().slice(0, 10).replace(/-/g, '');
-  displayDateFormat = yesterday.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-}
-// If the app is configured to report today, set queryDateFormat and displayDateFormat to today.
-else {
-  queryDateFormat = today.toISOString().slice(0, 10).replace(/-/g, '');
-  displayDateFormat = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+  let queryDateFormat;
+  let displayDateFormat;
+
+  // If the app is configured to report yesterday, set queryDateFormat and displayDateFormat to yesterday.
+  if (process.env.REPORT_TODAY_OR_YESTERDAY === 'yesterday') {
+    queryDateFormat = yesterday.toISOString().slice(0, 10).replace(/-/g, '');
+    displayDateFormat = yesterday.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+  }
+  // If the app is configured to report today, set queryDateFormat and displayDateFormat to today.
+  else {
+    queryDateFormat = today.toISOString().slice(0, 10).replace(/-/g, '');
+    displayDateFormat = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+  }
+
+  return {
+    query: queryDateFormat,
+    display: displayDateFormat
+  }
+
 }
 
 // Handle the Trigger Phrase option:
@@ -56,10 +66,6 @@ const handleTriggerPhrase = (config : string) => {
 let config = {
   app: {
     port: process.env.PORT || 2100,
-    todaysDate: {
-      queryFormat: queryDateFormat,
-      displayFormat: displayDateFormat,
-    }
   },
   harvest: {
     url: process.env.HARVEST_URL,
@@ -73,6 +79,7 @@ let config = {
     teamID: process.env.SLACK_TEAM_ID,
   },
   options: {
+    reportDay: process.env.REPORT_TODAY_OR_YESTERDAY || 'today',
     triggerPhrase: process.env.TRIGGER_PHRASE ? handleTriggerPhrase(process.env.TRIGGER_PHRASE) : 'Shamebot, activate!',
     orgMailsOnly: process.env.ORG_MAILS_ONLY ? !!+process.env.ORG_MAILS_ONLY : false,
     orgMailsTLD: process.env.ORG_EMAIL_TLD && process.env.ORG_EMAIL_TLD.includes('.') ? process.env.ORG_EMAIL_TLD : '',
@@ -95,4 +102,4 @@ config.harvest.headers = {
   'Harvest-Account-Id': `${config.harvest.accountID}`
 }
 
-export default config;
+export {config, getDay};

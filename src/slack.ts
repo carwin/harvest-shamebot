@@ -1,4 +1,4 @@
-import config from './util/env';
+import { config, getDay } from './util/env';
 
 // Describes the important part of the response from the Slack API when requesting Users.
 type SlackUserResponse = {
@@ -91,7 +91,7 @@ const shameMessageTemplate = (shameList: string, postScript: string) => {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `Team, don\'t forget to report the working hours in Harvest *every day*.\n\nHere is a list of people who have yet to report their working hours for *${config.app.todaysDate.displayFormat}*:`,
+          text: `Team, don\'t forget to report the working hours in Harvest *every day*.\n\nHere is a list of people who have yet to report their working hours for *${getDay().display}*:`,
         },
       },
       {

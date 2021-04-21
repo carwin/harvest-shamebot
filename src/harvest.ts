@@ -1,7 +1,7 @@
 // const axios = require('axios').default;
 // const { config } = require('./main.js');
 import axios from 'axios';
-import config from './util/env';
+import { config, getDay } from './util/env';
 
 type HarvestUser = {
   name: string;
@@ -66,7 +66,7 @@ const getUsers = async() => {
 }
 
 const getTodaysTimeReport = async() => {
-  const today: string = config.app.todaysDate.queryFormat;
+  const today: string = getDay().query;
   let todaysReport = await axios.get(`${config.harvest.url}/reports/time/team?from=${today}&to=${today}`, {headers: config.harvest.headers});
   return  todaysReport.data.results;
 }

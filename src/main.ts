@@ -1,7 +1,7 @@
 // @ts-ignore
 import schedule from 'node-schedule';
 import { App } from '@slack/bolt';
-import config from './util/env';
+import { config, getDay } from './util/env';
 import { isGenericMessageEvent } from './util/helpers'
 import * as harvest from './harvest';
 import * as slack from './slack';
@@ -12,6 +12,7 @@ const app = new App({
   signingSecret: config.slack.signingSecret
 });
 
+
 // The primary app function:
 (async () => {
   // Run the application on a particular port:
@@ -19,7 +20,7 @@ const app = new App({
 
   // Log some useful messages:
   console.log('Harvest Shamebot is online...');
-  console.log('Shamebot thinks today is:', config.app.todaysDate.displayFormat);
+  console.log(`Shamebot is set to report on ${config.options.reportDay}'s time: ${getDay().display}`)
   console.log('Shamebot is listening for the trigger phrase: ', config.options.triggerPhrase);
 
   // Set up a scheduled run of the Message of Shame:
