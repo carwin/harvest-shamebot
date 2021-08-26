@@ -1,11 +1,11 @@
-**DEPRECATED**
-__This project has been deprecated in favor of my more comprehensive Harvest /
-Slack bot over at [[https://github.com/mobomo/mobot]]__.
+**!! DEPRECATED**
+_This project has been deprecated in favor of my more comprehensive Harvest /
+Slack bot over at [Mobot](https://github.com/mobomo/mobot)_.
 
 # Harvest Shamebot for Slack
 
-__This project is intentionally meant to be silly and not meant to provide
-actual shame__.
+_This project is intentionally meant to be silly and not meant to provide
+actual shame_.
 
 The Harvest Shamebot goes through your organization's [Harvest](http://harvestapp.com)
 data and looks for users who haven't submitted all their time for the day. Once
